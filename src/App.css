@@ -62,6 +62,43 @@ h1 {
 .card.expense  { border-top: 3px solid #ef4444; }
 .card.expense h2 { color: #ef4444; }
 
+/* ── Charts ── */
+.charts {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.chart-card {
+  background: #1a1a24;
+  border: 1px solid #2a2a38;
+  border-radius: 14px;
+  padding: 18px 14px;
+  text-align: center;
+}
+
+.chart-card h3 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: #fff;
+}
+
+/* Fix recharts text for dark theme */
+.chart-card .recharts-text {
+  fill: #ccc;
+  font-size: 12px;
+}
+
+.chart-card .recharts-legend-item-text {
+  color: #ccc !important;
+}
+
+.chart-card .recharts-tooltip-wrapper {
+  color: #000;
+}
+
 /* ── Form ── */
 .form {
   display: flex;

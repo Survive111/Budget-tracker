@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react'
 import './App.css'
+import { PieChart, Pie, Cell, Tooltip, Legend } from 'recharts'
+
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#AF19FF', '#FF5252', '#8884d8', '#82ca9d']
 
 function App() {
   const [transactions, setTransactions] = useState(() => {
@@ -22,7 +25,6 @@ function App() {
   const [amount, setAmount] = useState('')
   const [note, setNote] = useState('')
 
-  // For adding new category
   const [showNewCategoryInput, setShowNewCategoryInput] = useState(false)
   const [newCategory, setNewCategory] = useState('')
 
@@ -44,11 +46,28 @@ function App() {
 
   const currentCategories = type === 'expense' ? expenseCategories : incomeCategories
 
+  // Group transactions by category for charts
+  function getChartData(filterType) {
+    const grouped = transactions
+      .filter(t => t.type === filterType)
+      .reduce((acc, t) => {
+        acc[t.category] = (acc[t.category] || 0) + Number(t.amount)
+        return acc
+      }, {})
+
+    return Object.keys(grouped).map(cat => ({
+      name: cat,
+      value: grouped[cat]
+    }))
+  }
+
+  const expenseChartData = getChartData('expense')
+  const incomeChartData = getChartData('income')
+
   function handleTypeChange(newType) {
     setType(newType)
     setShowNewCategoryInput(false)
     setNewCategory('')
-    // Set category to first of new type
     setCategory(newType === 'expense' ? expenseCategories[0] : incomeCategories[0])
   }
 
@@ -115,9 +134,35 @@ function App() {
     setTransactions(transactions.filter(t => t.id !== id))
   }
 
+  function renderChart(title, data) {
+    if (data.length === 0) return null
+    return (
+      <div className="card chart-card">
+        <h3>{title}</h3>
+        <PieChart width={340} height={280} style={{ margin: '0 auto' }}>
+          <Pie
+            data={data}
+            dataKey="value"
+            nameKey="name"
+            cx="50%"
+            cy="50%"
+            outerRadius={90}
+            label={(entry) => `${entry.name}: R${entry.value}`}
+          >
+            {data.map((entry, index) => (
+              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+            ))}
+          </Pie>
+          <Tooltip formatter={(value) => `R ${value}`} />
+          <Legend />
+        </PieChart>
+      </div>
+    )
+  }
+
   return (
     <div className="container">
-      <h1>💰 Budget Tracker SA</h1>
+      <h1>Budget Tracker</h1>
 
       <div className="summary">
         <div className="card balance">
@@ -132,6 +177,11 @@ function App() {
           <p>Expenses</p>
           <h2>R {expenses.toFixed(2)}</h2>
         </div>
+      </div>
+
+      <div className="charts">
+        {renderChart('Where Your Money Goes', expenseChartData)}
+        {renderChart('Where Your Money Comes From', incomeChartData)}
       </div>
 
       <form onSubmit={addTransaction} className="form">
@@ -162,7 +212,6 @@ function App() {
           </div>
         )}
 
-        {/* Optional: show delete for custom categories */}
         {!showNewCategoryInput && category && (
           <div style={{ fontSize: '12px', marginTop: '5px', textAlign: 'right' }}>
             <button type="button" onClick={() => deleteCategory(category)} style={{ background: 'none', border: 'none', color: '#ff5252', cursor: 'pointer' }}>
