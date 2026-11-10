@@ -28,6 +28,11 @@ function App() {
   const [showNewCategoryInput, setShowNewCategoryInput] = useState(false)
   const [newCategory, setNewCategory] = useState('')
 
+  // --- FILTER + SEARCH ---
+  const [searchTerm, setSearchTerm] = useState('')
+  const [filterType, setFilterType] = useState('all') // all | income | expense
+  const [filterCategory, setFilterCategory] = useState('All')
+
   useEffect(() => {
     localStorage.setItem('transactions', JSON.stringify(transactions))
   }, [transactions])
@@ -134,6 +139,21 @@ function App() {
     setTransactions(transactions.filter(t => t.id !== id))
   }
 
+  // --- FILTERED TRANSACTIONS ---
+  const allCategories = ['All', ...new Set(transactions.map(t => t.category))]
+
+  const filteredTransactions = transactions.filter(t => {
+    if (filterType !== 'all' && t.type !== filterType) return false
+    if (filterCategory !== 'All' && t.category !== filterCategory) return false
+    if (searchTerm) {
+      const search = searchTerm.toLowerCase()
+      const inCategory = t.category.toLowerCase().includes(search)
+      const inNote = (t.note || '').toLowerCase().includes(search)
+      if (!inCategory && !inNote) return false
+    }
+    return true
+  })
+
   function renderChart(title, data) {
     if (data.length === 0) return null
     return (
@@ -236,11 +256,49 @@ function App() {
       </form>
 
       <p className="list-header">Recent Transactions</p>
-      <div className="list">
-        {transactions.length === 0 && (
-          <p className="empty">No transactions yet. Add your first one above!</p>
+
+      {/* --- FILTER + SEARCH UI --- */}
+      <div className="card filter-card">
+        <input
+          placeholder="🔍 Search by note or category e.g. Taxi..."
+          value={searchTerm}
+          onChange={e => setSearchTerm(e.target.value)}
+          className="search-input"
+        />
+
+        <div className="chip-row">
+          <button type="button" className={filterType === 'all' ? 'chip active' : 'chip'} onClick={() => setFilterType('all')}>All</button>
+          <button type="button" className={filterType === 'income' ? 'chip active income-chip' : 'chip'} onClick={() => setFilterType('income')}>Income</button>
+          <button type="button" className={filterType === 'expense' ? 'chip active expense-chip' : 'chip'} onClick={() => setFilterType('expense')}>Expenses</button>
+        </div>
+
+        <div className="chip-row">
+          {allCategories.map(cat => (
+            <button
+              type="button"
+              key={cat}
+              className={filterCategory === cat ? 'chip active' : 'chip'}
+              onClick={() => setFilterCategory(cat)}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+
+        {(searchTerm || filterType !== 'all' || filterCategory !== 'All') && (
+          <button type="button" className="clear-btn" onClick={() => { setSearchTerm(''); setFilterType('all'); setFilterCategory('All') }}>
+            Clear filters ✕
+          </button>
         )}
-        {transactions.map(t => (
+      </div>
+
+      <p style={{ fontSize: '13px', opacity: 0.7 }}>Showing {filteredTransactions.length} of {transactions.length} transactions</p>
+
+      <div className="list">
+        {filteredTransactions.length === 0 && (
+          <p className="empty">{transactions.length === 0 ? 'No transactions yet. Add your first one above!' : 'No transactions match your filters.'}</p>
+        )}
+        {filteredTransactions.map(t => (
           <div key={t.id} className={`item ${t.type}`}>
             <div className="item-left">
               <strong>{t.category}</strong> <span>— {t.note}</span>

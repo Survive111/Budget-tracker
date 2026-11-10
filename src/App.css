@@ -157,6 +157,84 @@ h1 {
   background: #6355e0;
 }
 
+/* ── Filter + Search ── */
+.filter-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 12px;
+  text-align: left;
+  flex: none;
+  padding: 16px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 11px 14px;
+  border-radius: 10px;
+  border: 1px solid #2a2a38;
+  background: #0f0f13;
+  color: #fff;
+  font-size: 0.95rem;
+}
+
+.search-input::placeholder {
+  color: #555;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #7c6ffd;
+}
+
+.chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid #2a2a38;
+  background: #0f0f13;
+  color: #ccc;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.2s;
+}
+
+.chip:hover {
+  border-color: #7c6ffd;
+  color: #fff;
+}
+
+.chip.active {
+  background: #7c6ffd;
+  color: #fff;
+  border-color: #7c6ffd;
+}
+
+.chip.active.income-chip {
+  background: #22c55e;
+  border-color: #22c55e;
+}
+
+.chip.active.expense-chip {
+  background: #ef4444;
+  border-color: #ef4444;
+}
+
+.clear-btn {
+  align-self: flex-start;
+  background: none;
+  border: none;
+  color: #ef4444;
+  cursor: pointer;
+  font-size: 13px;
+  padding: 0;
+}
+
 /* ── Transaction List ── */
 .list-header {
   font-size: 0.8rem;
