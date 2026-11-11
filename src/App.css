@@ -24,6 +24,28 @@ h1 {
   letter-spacing: -0.5px;
 }
 
+/* ── Header + Theme Button ── */
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-row h1 {
+  margin-bottom: 24px;
+}
+
+.theme-btn {
+  background: #1a1a24;
+  border: 1px solid #2a2a38;
+  color: #fff;
+  padding: 8px 14px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-bottom: 24px;
+}
+
 /* ── Summary Cards ── */
 .summary {
   display: flex;
@@ -85,7 +107,6 @@ h1 {
   color: #fff;
 }
 
-/* Fix recharts text for dark theme */
 .chart-card .recharts-text {
   fill: #ccc;
   font-size: 12px;
@@ -318,4 +339,79 @@ h1 {
 
 .item-right button:hover {
   opacity: 1;
+}
+
+/* ── LIGHT MODE ── */
+body:has(.container:not(.dark)) {
+  background: #c1c1e9;
+  color: #111;
+}
+
+.container:not(.dark) {
+  color: #111;
+}
+
+.container:not(.dark) .theme-btn {
+  background: #fff;
+  border-color: #ddd;
+  color: #111;
+}
+
+.container:not(.dark) .card,
+.container:not(.dark) .chart-card,
+.container:not(.dark) .form,
+.container:not(.dark) .item {
+  background: #fff;
+  border-color: #e5e5ea;
+  color: #111;
+}
+
+.container:not(.dark) .card p,
+.container:not(.dark) .item-left span,
+.container:not(.dark) .list-header {
+  color: #666;
+}
+
+.container:not(.dark) .chart-card h3,
+.container:not(.dark) .item-left strong {
+  color: #111;
+}
+
+.container:not(.dark) .chart-card .recharts-text {
+  fill: #333;
+}
+
+.container:not(.dark) .chart-card .recharts-legend-item-text {
+  color: #333 !important;
+}
+
+.container:not(.dark) .form input,
+.container:not(.dark) .form select,
+.container:not(.dark) .search-input,
+.container:not(.dark) .chip {
+  background: #f9f9f9;
+  border-color: #e5e5ea;
+  color: #111;
+}
+
+.container:not(.dark) .form input::placeholder,
+.container:not(.dark) .search-input::placeholder {
+  color: #999;
+}
+
+.container:not(.dark) .chip {
+  color: #333;
+}
+
+.container:not(.dark) .chip:hover {
+  color: #111;
+}
+
+.container:not(.dark) .item:hover {
+  border-color: #d1d1d6;
+}
+
+.container:not(.dark) .item-left small,
+.container:not(.dark) .empty {
+  color: #888;
 }
