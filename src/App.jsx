@@ -28,12 +28,10 @@ function App() {
   const [showNewCategoryInput, setShowNewCategoryInput] = useState(false)
   const [newCategory, setNewCategory] = useState('')
 
-  // --- FILTER + SEARCH ---
   const [searchTerm, setSearchTerm] = useState('')
   const [filterType, setFilterType] = useState('all')
   const [filterCategory, setFilterCategory] = useState('All')
 
-  // --- DARK MODE ---
   const [darkMode, setDarkMode] = useState(() => {
     return localStorage.getItem('theme') !== 'light'
   })
@@ -67,7 +65,6 @@ function App() {
         acc[t.category] = (acc[t.category] || 0) + Number(t.amount)
         return acc
       }, {})
-
     return Object.keys(grouped).map(cat => ({
       name: cat,
       value: grouped[cat]
@@ -84,29 +81,30 @@ function App() {
     setCategory(newType === 'expense' ? expenseCategories[0] : incomeCategories[0])
   }
 
+  // FIXED: No more __add_new__ option in the select
   function handleCategoryChange(value) {
-    if (value === '__add_new__') {
-      setShowNewCategoryInput(true)
-      setNewCategory('')
-    } else {
-      setCategory(value)
-      setShowNewCategoryInput(false)
-    }
+    setCategory(value)
+    setShowNewCategoryInput(false)
   }
 
   function addNewCategory() {
     const trimmed = newCategory.trim()
     if (!trimmed) return
-    if (currentCategories.includes(trimmed)) {
-      setCategory(trimmed)
+
+    const list = type === 'expense' ? expenseCategories : incomeCategories
+    const exists = list.some(c => c.toLowerCase() === trimmed.toLowerCase())
+    if (exists) {
+      const match = list.find(c => c.toLowerCase() === trimmed.toLowerCase())
+      setCategory(match)
       setShowNewCategoryInput(false)
+      setNewCategory('')
       return
     }
 
     if (type === 'expense') {
-      setExpenseCategories([...expenseCategories, trimmed])
+      setExpenseCategories(prev => [...prev, trimmed])
     } else {
-      setIncomeCategories([...incomeCategories, trimmed])
+      setIncomeCategories(prev => [...prev, trimmed])
     }
     setCategory(trimmed)
     setShowNewCategoryInput(false)
@@ -128,7 +126,6 @@ function App() {
   function addTransaction(e) {
     e.preventDefault()
     if (!amount || !category) return
-
     const newTx = {
       id: Date.now(),
       type,
@@ -137,7 +134,6 @@ function App() {
       note,
       date: new Date().toLocaleDateString()
     }
-
     setTransactions([newTx, ...transactions])
     setAmount('')
     setNote('')
@@ -223,13 +219,23 @@ function App() {
             <option value="income">Income</option>
           </select>
 
-          <select value={showNewCategoryInput ? '__add_new__' : category} onChange={e => handleCategoryChange(e.target.value)}>
+          <select value={category} onChange={e => handleCategoryChange(e.target.value)}>
             {currentCategories.map(cat => (
               <option key={cat} value={cat}>{cat}</option>
             ))}
-            <option value="__add_new__">+ Add New Category...</option>
           </select>
         </div>
+
+        {/* NEW: Real button, not a dropdown option */}
+        {!showNewCategoryInput && (
+          <button
+            type="button"
+            onClick={() => { setShowNewCategoryInput(true); setNewCategory('') }}
+            style={{ background: 'transparent', border: '1px dashed #7c6ffd', color: '#7c6ffd', padding: '8px', fontSize: '14px' }}
+          >
+            + Add New {type === 'expense' ? 'Expense' : 'Income'} Category
+          </button>
+        )}
 
         {showNewCategoryInput && (
           <div className="form-row" style={{ marginTop: '10px' }}>
@@ -237,6 +243,12 @@ function App() {
               placeholder={`New ${type} category e.g. ${type === 'expense' ? 'Data' : 'Allowance'}`}
               value={newCategory}
               onChange={e => setNewCategory(e.target.value)}
+              onKeyDown={e => {
+                if (e.key === 'Enter') {
+                  e.preventDefault()
+                  addNewCategory()
+                }
+              }}
               autoFocus
             />
             <button type="button" onClick={addNewCategory}>Save Category</button>
