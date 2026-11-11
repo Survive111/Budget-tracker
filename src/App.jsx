@@ -30,8 +30,13 @@ function App() {
 
   // --- FILTER + SEARCH ---
   const [searchTerm, setSearchTerm] = useState('')
-  const [filterType, setFilterType] = useState('all') // all | income | expense
+  const [filterType, setFilterType] = useState('all')
   const [filterCategory, setFilterCategory] = useState('All')
+
+  // --- DARK MODE ---
+  const [darkMode, setDarkMode] = useState(() => {
+    return localStorage.getItem('theme') !== 'light'
+  })
 
   useEffect(() => {
     localStorage.setItem('transactions', JSON.stringify(transactions))
@@ -45,13 +50,16 @@ function App() {
     localStorage.setItem('incomeCategories', JSON.stringify(incomeCategories))
   }, [incomeCategories])
 
+  useEffect(() => {
+    localStorage.setItem('theme', darkMode ? 'dark' : 'light')
+  }, [darkMode])
+
   const income = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + Number(t.amount), 0)
   const expenses = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + Number(t.amount), 0)
   const balance = income - expenses
 
   const currentCategories = type === 'expense' ? expenseCategories : incomeCategories
 
-  // Group transactions by category for charts
   function getChartData(filterType) {
     const grouped = transactions
       .filter(t => t.type === filterType)
@@ -139,7 +147,6 @@ function App() {
     setTransactions(transactions.filter(t => t.id !== id))
   }
 
-  // --- FILTERED TRANSACTIONS ---
   const allCategories = ['All', ...new Set(transactions.map(t => t.category))]
 
   const filteredTransactions = transactions.filter(t => {
@@ -181,8 +188,13 @@ function App() {
   }
 
   return (
-    <div className="container">
-      <h1>Budget Tracker</h1>
+    <div className={darkMode ? "container dark" : "container"}>
+      <div className="header-row">
+        <h1>Budget Tracker</h1>
+        <button type="button" className="theme-btn" onClick={() => setDarkMode(!darkMode)}>
+          {darkMode ? "☀️ Light" : "🌙 Dark"}
+        </button>
+      </div>
 
       <div className="summary">
         <div className="card balance">
@@ -257,7 +269,6 @@ function App() {
 
       <p className="list-header">Recent Transactions</p>
 
-      {/* --- FILTER + SEARCH UI --- */}
       <div className="card filter-card">
         <input
           placeholder="🔍 Search by note or category e.g. Taxi..."
